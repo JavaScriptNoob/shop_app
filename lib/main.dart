@@ -10,10 +10,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
-      title: 'Flutter JSON Demo',
-
+      title: 'Coworking',
       home: MyHomePage(),
     );
   }
@@ -25,7 +23,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List <int> _listIndex = [];
+  List<int> _listIndex = [];
   var _myCollection;
   late Future<OfficesList> officesList;
 
@@ -35,49 +33,53 @@ class _MyHomePageState extends State<MyHomePage> {
     officesList = getOfficesList();
   }
 
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Manual JSON Serialisation'),
+        title: Text('Coworking'),
         centerTitle: true,
         actions: <Widget>[
-          IconButton(
-              onPressed: _dataPushed, icon: const Icon(Icons.list))
+          IconButton(onPressed: _dataPushed, icon: const Icon(Icons.list))
         ],
       ),
       body: FutureBuilder<OfficesList>(
-        future: officesList,
+        ///// Creates a widget that builds itself based on the latest snapshot of
+        /// interaction with a [Future].
+        future: officesList, //Parsed json type List(instance)
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            print(snapshot.data!.offices.toString());
-            print('Hello ${officesList.runtimeType}');
-            print("context +++++++++++++++++++++ ${context}");
-             _myCollection = snapshot.data!.offices;
-            return ListView.builder(
 
+            _myCollection = snapshot.data!.offices;
+            return ListView.builder(
               itemCount: snapshot.data!.offices.length,
               itemBuilder: (context, index) {
                 final savedValues = _listIndex.contains(index);
-                print('Adress: ${snapshot.data!.offices[index].address}');
+
                 return Card(
+                  elevation: savedValues ? 10 : 2,
+                  color: savedValues ? Colors.white: null,
+                  shape: savedValues
+                      ? RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          side: BorderSide(color: Colors.white70, width: 1),
+                        )
+                      : null,
                   child: ListTile(
                     title: Text('${snapshot.data!.offices[index].name}'),
                     subtitle: Text('${snapshot.data!.offices[index].address}'),
-
                     leading:
-                    Image.network('${snapshot.data!.offices[index].image}'),
-                    trailing: Icon(savedValues ? Icons.add_shopping_cart : Icons
-                        .add_shopping_cart,
-                        color: savedValues ? Colors.red : null),
+                        Image.network('${snapshot.data!.offices[index].image}'),
+                    trailing: Icon(
+                        savedValues
+                            ? Icons.train_outlined
+                            : Icons.train_outlined,
+                        color: savedValues ? Colors.red : null,
+                        size: savedValues ? 30.0 : null),
                     onTap: () {
                       setState(() {
-                        if (!savedValues
-
-                        ) {
+                        if (!savedValues) {
                           _listIndex.add(index);
-                          print(
-                              'hhhhhhhhhhhhh : ${_listIndex}');
+
                         } else if (savedValues) {
                           _listIndex.remove(index);
                         }
@@ -92,56 +94,34 @@ class _MyHomePageState extends State<MyHomePage> {
           }
           return Center(child: CircularProgressIndicator());
         },
-
       ),
     );
   }
 
   void _dataPushed() {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (BuildContext context) {
-          final Iterable<int> indexes = _listIndex;
-          print(_listIndex);
-          return Scaffold(
-              appBar: AppBar(
-                title: Text("Hello"),
-              ),
-              body: ListView.builder(
-                  itemCount: _listIndex.length, itemBuilder: (context, item) {
-                print(_listIndex);
-                print("++++++++++++++++${officesList}");
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      final Iterable<int> indexes = _listIndex;
+
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("Hello"),
+          ),
+          body: ListView.builder(
+              itemCount: _listIndex.length,
+              itemBuilder: (context, item) {
+
                 return Card(
                     child: ListTile(
-                    title: Text('${_myCollection[item].name}'),
-                subtitle: Text('kdfkkfdk')));
-              }
-              )
-          );
-        }
-        )
-    );
+                        title: Text('${_myCollection[item].name}'),
+                        subtitle: Text('${_myCollection[item].address}'),
+                    trailing:Image.network('${_myCollection[item].image}'),
+                    ));
+
+              }));
+    }));
   }
 
-  void _iterateDatalist() {
-
-  }
 
 }
 
-
-// Future<http.Response> getData() async {
-//   var url = Uri.parse('https://about.google/static/data/locations.json');
-//   return await http.get(url);
-// }
-
-// void loadData() {
-//   getData().then((response){
-//     if (response.statusCode == 200) {
-//       print(response.body);
-//     } else {
-//       print(response.statusCode);
-//     }
-//   }).catchError((error){
-//     debugPrint(error.toString());
-//   });
-// }

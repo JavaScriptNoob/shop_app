@@ -10,8 +10,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Flutter JSON Demo',
+
       home: MyHomePage(),
     );
   }
@@ -23,7 +25,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
- List  <int> _listIndex = [] ;
+  List <int> _listIndex = [];
+  var _myCollection;
   late Future<OfficesList> officesList;
 
   @override
@@ -32,12 +35,16 @@ class _MyHomePageState extends State<MyHomePage> {
     officesList = getOfficesList();
   }
 
+
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         title: Text('Manual JSON Serialisation'),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+              onPressed: _dataPushed, icon: const Icon(Icons.list))
+        ],
       ),
       body: FutureBuilder<OfficesList>(
         future: officesList,
@@ -45,7 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
           if (snapshot.hasData) {
             print(snapshot.data!.offices.toString());
             print('Hello ${officesList.runtimeType}');
-
+            print("context +++++++++++++++++++++ ${context}");
+             _myCollection = snapshot.data!.offices;
             return ListView.builder(
 
               itemCount: snapshot.data!.offices.length,
@@ -58,18 +66,21 @@ class _MyHomePageState extends State<MyHomePage> {
                     subtitle: Text('${snapshot.data!.offices[index].address}'),
 
                     leading:
-                        Image.network('${snapshot.data!.offices[index].image}'),
-                    trailing: Icon(savedValues ? Icons.add_shopping_cart : Icons.add_shopping_cart,
-                    color: savedValues ? Colors.red : null),
-                    onTap:(){
-                      setState(() {if(!savedValues
+                    Image.network('${snapshot.data!.offices[index].image}'),
+                    trailing: Icon(savedValues ? Icons.add_shopping_cart : Icons
+                        .add_shopping_cart,
+                        color: savedValues ? Colors.red : null),
+                    onTap: () {
+                      setState(() {
+                        if (!savedValues
 
-                      ) {
-                        _listIndex.add(index);
-                        print('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh : ${_listIndex}');
-                      }else if (savedValues){
-                        _listIndex.remove(index);
-                      }
+                        ) {
+                          _listIndex.add(index);
+                          print(
+                              'hhhhhhhhhhhhh : ${_listIndex}');
+                        } else if (savedValues) {
+                          _listIndex.remove(index);
+                        }
                       });
                     },
                   ),
@@ -85,6 +96,36 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  void _dataPushed() {
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (BuildContext context) {
+          final Iterable<int> indexes = _listIndex;
+          print(_listIndex);
+          return Scaffold(
+              appBar: AppBar(
+                title: Text("Hello"),
+              ),
+              body: ListView.builder(
+                  itemCount: _listIndex.length, itemBuilder: (context, item) {
+                print(_listIndex);
+                print("++++++++++++++++${officesList}");
+                return Card(
+                    child: ListTile(
+                    title: Text('${_myCollection[item].name}'),
+                subtitle: Text('kdfkkfdk')));
+              }
+              )
+          );
+        }
+        )
+    );
+  }
+
+  void _iterateDatalist() {
+
+  }
+
 }
 
 
